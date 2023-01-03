@@ -1,0 +1,13 @@
+# IDEs
+.idea
+.vscode
+
+# Lock file
+pubspec.lock
+
+# macOS
+.DS_Store
+
+# Created by `dart pub`
+.dart_tool/
+puby
