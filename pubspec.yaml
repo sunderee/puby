@@ -7,7 +7,12 @@ environment:
   sdk: ">=2.19.0-444.2.beta <3.0.0"
 
 dependencies:
+  # CLI arguments parser
   args: ^2.3.1
+
+  # Utilities
+  dart_scope_functions: ^0.0.2
+  meta: ^1.8.0
 
 dev_dependencies:
   lints: ^2.0.1
