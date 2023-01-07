@@ -37,5 +37,15 @@ void main() {
         DependencyEnum.development,
       );
     });
+
+    test('parse include/exclude', () {
+      final arguments = <String>['--path=path/to/file', '--include=abc,def']
+          .let((it) => parseArguments(it));
+      expect(arguments.includeDependenciesSet != null, true);
+      expect(
+        arguments.includeDependenciesSet?.containsAll(['abc', 'def']),
+        true,
+      );
+    });
   });
 }
