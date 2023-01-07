@@ -10,9 +10,14 @@ dependencies:
   # CLI arguments parser
   args: ^2.3.1
 
+  # YAML
+  yaml: ^3.1.1
+
   # Utilities
   dart_scope_functions: ^0.0.2
+  ktuples: ^0.0.2
   meta: ^1.8.0
+  equatable: ^2.0.5
 
 dev_dependencies:
   lints: ^2.0.1
