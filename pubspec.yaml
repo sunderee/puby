@@ -16,6 +16,7 @@ dependencies:
   # Utilities
   dart_scope_functions: ^0.0.2
   ktuples: ^0.0.2
+  collection: ^1.17.0
   meta: ^1.8.0
   equatable: ^2.0.5
 
