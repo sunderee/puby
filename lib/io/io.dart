@@ -60,9 +60,9 @@ class IO {
 
     final startOfEnvironment = lines.indexOf('environment:');
     environment.first
-        .let((it) => lines[startOfEnvironment + 1] = '  sdk: "$it"');
+        .let((it) => lines[startOfEnvironment + 1] = '  sdk: ">=$it"');
     environment.second
-        ?.let((it) => lines[startOfEnvironment + 2] = '  flutter: "$it"');
+        ?.let((it) => lines[startOfEnvironment + 2] = '  flutter: ">=$it"');
 
     for (var item in upgradableDependencies) {
       lines
