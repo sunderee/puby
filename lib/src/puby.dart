@@ -4,10 +4,13 @@ import 'package:collection/collection.dart';
 import 'package:dart_scope_functions/dart_scope_functions.dart';
 import 'package:ktuples/ktuples.dart';
 import 'package:puby/api/api.service.dart';
+import 'package:puby/api/models/sdk_release.model.dart';
 import 'package:puby/cli/cli.configuration.dart';
 import 'package:puby/cli/cli.enums.dart';
 import 'package:puby/io/io.dart';
+import 'package:puby/io/models/environment.model.dart';
 import 'package:puby/utils/printer.dart';
+import 'package:puby/utils/types.dart';
 
 class PUBy {
   final CLIConfiguration cli;
@@ -27,6 +30,7 @@ class PUBy {
     final fullEnvironment = Pair(currentSDK, latestSDK);
     Printer.sdkPrint(
       cli.projectSDKChannel,
+      cli.isFlutter,
       fullEnvironment,
     ).also((it) => print(it));
 
@@ -80,7 +84,45 @@ class PUBy {
     }
 
     if (cli.writeToFile) {
-      // TODO: figure this part out
+      await _io.writeChangesToPubspec(
+        pubspecFile,
+        _getEnvironment(
+          cli.projectSDKChannel,
+          cli.isFlutter,
+          fullEnvironment,
+        ),
+        upgradableDependencies,
+      );
     }
+  }
+
+  Environment _getEnvironment(
+    SDKEnum sdk,
+    bool isFlutter,
+    Pair<EnvironmentModel, SDKReleaseModel> input,
+  ) {
+    var dartSDK = input.first.dartSDK;
+    var flutterSDK = input.first.flutterSDK;
+
+    if (sdk == SDKEnum.stable) {
+      if (input.first.dartSDK != input.second.stable.dartSDK) {
+        dartSDK = input.second.stable.dartSDK;
+      }
+
+      if (isFlutter &&
+          (input.first.flutterSDK != input.second.stable.flutterSDK)) {
+        flutterSDK = input.second.stable.flutterSDK;
+      }
+    } else {
+      if (input.first.dartSDK != input.second.beta.dartSDK) {
+        dartSDK = input.second.beta.dartSDK;
+      }
+
+      if (isFlutter &&
+          (input.first.flutterSDK != input.second.beta.flutterSDK)) {
+        flutterSDK = input.second.beta.flutterSDK;
+      }
+    }
+    return Environment(dartSDK, flutterSDK);
   }
 }

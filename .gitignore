@@ -8,6 +8,9 @@ pubspec.lock
 # macOS
 .DS_Store
 
+# Test coverage
+coverage
+
 # Created by `dart pub`
 .dart_tool/
 puby

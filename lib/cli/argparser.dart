@@ -47,6 +47,12 @@ CLIConfiguration parseArguments(List<String> arguments) {
     )
     ..addSeparator('Flags')
     ..addFlag(
+      'flutter',
+      abbr: 'f',
+      defaultsTo: false,
+      help: 'Sets if this is a Flutter project (for setting SDK constraints).',
+    )
+    ..addFlag(
       'unstable',
       abbr: 'u',
       defaultsTo: false,
@@ -61,7 +67,7 @@ CLIConfiguration parseArguments(List<String> arguments) {
     ..addFlag(
       'write',
       abbr: 'w',
-      defaultsTo: true,
+      defaultsTo: false,
       help: 'Should you write changes to the pubspec.yaml file.',
     )
     ..addFlag(
@@ -106,6 +112,7 @@ CLIConfiguration parseArguments(List<String> arguments) {
       exclude = null;
     }
 
+    final isFlutter = results['flutter'] as bool;
     final allowUnstable = results['unstable'] as bool;
     final useVerboseOutput = results['verbose'] as bool;
     final writeToFile = results['write'] as bool;
@@ -116,6 +123,7 @@ CLIConfiguration parseArguments(List<String> arguments) {
       projectSDKChannel: sdk,
       includeDependenciesSet: include,
       excludeDependenciesSet: exclude,
+      isFlutter: isFlutter,
       allowUnstable: allowUnstable,
       useVerboseOutput: useVerboseOutput,
       writeToFile: writeToFile,

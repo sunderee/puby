@@ -8,6 +8,7 @@ class CLIConfiguration {
   final SDKEnum projectSDKChannel;
   final Set<String>? includeDependenciesSet;
   final Set<String>? excludeDependenciesSet;
+  final bool isFlutter;
   final bool allowUnstable;
   final bool useVerboseOutput;
   final bool writeToFile;
@@ -18,6 +19,7 @@ class CLIConfiguration {
     required this.projectSDKChannel,
     required this.includeDependenciesSet,
     required this.excludeDependenciesSet,
+    required this.isFlutter,
     required this.allowUnstable,
     required this.useVerboseOutput,
     required this.writeToFile,

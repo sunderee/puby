@@ -10,6 +10,7 @@ class Printer {
 
   static String sdkPrint(
     SDKEnum sdk,
+    bool isFlutter,
     Pair<EnvironmentModel, SDKReleaseModel> input,
   ) {
     final buffer = StringBuffer();
@@ -21,7 +22,7 @@ class Printer {
         buffer.writeln('Dart SDK: $oldSDK -> $newSDK');
       }
 
-      if (input.first.flutterSDK != null &&
+      if (isFlutter &&
           (input.first.flutterSDK != input.second.stable.flutterSDK)) {
         final oldSDK = '\u001b[31m${input.first.flutterSDK}\u001b[0m';
         final newSDK = '\u001b[32m${input.second.stable.flutterSDK}\u001b[0m';
@@ -34,7 +35,7 @@ class Printer {
         buffer.writeln('Dart SDK: $oldSDK -> $newSDK');
       }
 
-      if (input.first.flutterSDK != null &&
+      if (isFlutter &&
           (input.first.flutterSDK != input.second.beta.flutterSDK)) {
         final oldSDK = '\u001b[31m${input.first.flutterSDK}\u001b[0m';
         final newSDK = '\u001b[32m${input.second.beta.flutterSDK}\u001b[0m';
