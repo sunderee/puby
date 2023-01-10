@@ -59,12 +59,6 @@ CLIConfiguration parseArguments(List<String> arguments) {
       help: 'Should you allow for unstable (alpha/beta/dev) versions.',
     )
     ..addFlag(
-      'verbose',
-      abbr: 'v',
-      defaultsTo: false,
-      help: 'Should you output more information.',
-    )
-    ..addFlag(
       'write',
       abbr: 'w',
       defaultsTo: false,
@@ -114,7 +108,6 @@ CLIConfiguration parseArguments(List<String> arguments) {
 
     final isFlutter = results['flutter'] as bool;
     final allowUnstable = results['unstable'] as bool;
-    final useVerboseOutput = results['verbose'] as bool;
     final writeToFile = results['write'] as bool;
 
     return CLIConfiguration(
@@ -125,7 +118,6 @@ CLIConfiguration parseArguments(List<String> arguments) {
       excludeDependenciesSet: exclude,
       isFlutter: isFlutter,
       allowUnstable: allowUnstable,
-      useVerboseOutput: useVerboseOutput,
       writeToFile: writeToFile,
     );
   } on FormatException catch (e) {
