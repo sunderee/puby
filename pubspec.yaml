@@ -4,22 +4,22 @@ version: 0.0.1
 publish_to: "none"
 
 environment:
-  sdk: ">=2.19.0-444.3.beta"
+  sdk: ">=2.19.0"
 
 dependencies:
   # CLI arguments parser
-  args: ^2.3.1
+  args: ^2.3.2
 
   # YAML
   yaml: ^3.1.1
 
   # Utilities
-  dart_scope_functions: ^0.0.2
+  dart_scope_functions: ^0.0.3
   ktuples: ^0.0.2
-  collection: ^1.17.0
+  collection: ^1.17.1
   meta: ^1.8.0
   equatable: ^2.0.5
 
 dev_dependencies:
   lints: ^2.0.1
-  test: ^1.22.1
+  test: ^1.22.2
