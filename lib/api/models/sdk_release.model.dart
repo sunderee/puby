@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:puby/utils/types.dart';
 
 @immutable
-class SDKReleaseModel {
+final class SDKReleaseModel {
   final ReleaseModel beta;
   final ReleaseModel stable;
 
@@ -32,7 +32,7 @@ class SDKReleaseModel {
 }
 
 @immutable
-class ReleaseModel {
+final class ReleaseModel {
   final String dartSDK;
   final String flutterSDK;
 

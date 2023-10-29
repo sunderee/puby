@@ -2,7 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:puby/cli/cli.enums.dart';
 
 @immutable
-class CLIConfiguration {
+final class CLIConfiguration {
   final String path;
   final DependencyEnum targetDependencies;
   final SDKEnum projectSDKChannel;

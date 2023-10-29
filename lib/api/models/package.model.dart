@@ -4,13 +4,10 @@ import 'package:meta/meta.dart';
 import 'package:puby/utils/types.dart';
 
 @immutable
-class PackageModel extends Equatable {
+final class PackageModel extends Equatable {
   final String name;
   final String latestStable;
   final String? latestUnstable;
-
-  @override
-  List<Object?> get props => [name, latestStable, latestUnstable];
 
   PackageModel._({
     required this.name,
@@ -32,4 +29,7 @@ class PackageModel extends Equatable {
       latestUnstable: latestUnstable,
     );
   }
+
+  @override
+  List<Object?> get props => [name, latestStable, latestUnstable];
 }

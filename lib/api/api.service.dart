@@ -3,19 +3,21 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dart_scope_functions/dart_scope_functions.dart';
+import 'package:meta/meta.dart';
 import 'package:puby/api/api.exception.dart';
 import 'package:puby/api/models/package.model.dart';
 import 'package:puby/api/models/sdk_release.model.dart';
 import 'package:puby/utils/types.dart';
 
-abstract class IApiService {
+abstract interface class IApiService {
   factory IApiService.instance() => _ApiService();
 
   Future<SDKReleaseModel> getSDKReleases();
   Future<List<PackageModel>> getLatestPackageVersions(List<String> packages);
 }
 
-class _ApiService implements IApiService {
+@immutable
+final class _ApiService implements IApiService {
   static const String _releasesHostname = 'storage.googleapis.com';
   static const String _pubAPIHostname = 'pub.dev';
   static const String _userAgent = 'puby:0.0.1 (+github.com/sunderee/puby)';
