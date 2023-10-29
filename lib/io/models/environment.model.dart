@@ -1,7 +1,8 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-class EnvironmentModel {
+final class EnvironmentModel extends Equatable {
   final String dartSDK;
   final String? flutterSDK;
 
@@ -9,4 +10,7 @@ class EnvironmentModel {
     required this.dartSDK,
     this.flutterSDK,
   });
+
+  @override
+  List<Object?> get props => [dartSDK, flutterSDK];
 }

@@ -6,6 +6,7 @@ analyzer:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
+
   errors:
     # always_use_package_imports: error
     # avoid_dynamic_calls: error
@@ -16,25 +17,31 @@ analyzer:
     # avoid_slow_async_io: error
     # avoid_type_to_string: error
     avoid_types_as_parameter_names: error
+    # avoid_unstable_final_fields: error
     # avoid_web_libraries_in_flutter: error
     # cancel_subscriptions: error
     # close_sinks: error
-    # collection_methods_unrelated_type: error
+    collection_methods_unrelated_type: error
     # comment_references: error
     control_flow_in_finally: error
+    # deprecated_member_use_from_same_package: error
     # diagnostic_describe_all_properties: error
     # discarded_futures: error
     empty_statements: error
     hash_and_equals: error
+    # implicit_reopen: error
+    # invalid_case_patterns: error
     # invariant_booleans: error
-    iterable_contains_unrelated_type: error
-    list_remove_unrelated_type: error
+    # iterable_contains_unrelated_type: error
+    # list_remove_unrelated_type: error
     # literal_only_boolean_expressions: error
     # no_adjacent_strings_in_list: error
     no_duplicate_case_values: error
     # no_logic_in_create_state: error
+    # no_self_assignments: error
+    # no_wildcard_variable_uses: error
     # prefer_relative_imports: error
-    prefer_void_to_null: error
+    # prefer_void_to_null: error
     # test_types_in_equals: error
     # throw_in_finally: error
     # unnecessary_statements: error
@@ -46,9 +53,10 @@ analyzer:
     # always_declare_return_types: error
     # always_put_control_body_on_new_line: error
     # always_put_required_named_parameters_first: error
-    always_require_non_null_named_parameters: error
+    # always_require_non_null_named_parameters: error
     # always_specify_types: error
     annotate_overrides: error
+    # annotate_redeclares: error
     # avoid_annotating_with_dynamic: error
     # avoid_as: error
     # avoid_bool_literals_in_conditional_expressions: error
@@ -90,7 +98,7 @@ analyzer:
     # conditional_uri_does_not_exist: error
     constant_identifier_names: error
     curly_braces_in_flow_control_structures: error
-    # dangling_library_doc_comments: error
+    dangling_library_doc_comments: error
     # deprecated_consistency: error
     # directives_ordering: error
     # do_not_use_environment: error
@@ -102,19 +110,19 @@ analyzer:
     file_names: error
     # flutter_style_todos: error
     implementation_imports: error
-    # implicit_call_tearoffs: error
+    implicit_call_tearoffs: error
     # join_return_with_assignment: error
     # leading_newlines_in_multiline_strings: error
     # library_annotations: error
     library_names: error
     library_prefixes: error
     library_private_types_in_public_api: error
-    # lines_longer_than_80_chars: error
+    # matching_super_parameters: error
     # missing_whitespace_between_adjacent_strings: error
     # no_default_cases: error
     no_leading_underscores_for_library_prefixes: error
     no_leading_underscores_for_local_identifiers: error
-    # no_runtimeType_toString: error
+    # no_literal_bool_comparisons: error
     non_constant_identifier_names: error
     # noop_primitive_operations: error
     null_check_on_nullable_type_parameter: error
@@ -145,7 +153,6 @@ analyzer:
     # prefer_final_in_for_each: error
     # prefer_final_locals: error
     # prefer_final_parameters: error
-    prefer_for_elements_to_map_fromIterable: error
     # prefer_foreach: error
     prefer_function_declarations_over_variables: error
     prefer_generic_function_type_aliases: error
@@ -158,7 +165,6 @@ analyzer:
     prefer_is_empty: error
     prefer_is_not_empty: error
     prefer_is_not_operator: error
-    prefer_iterable_whereType: error
     # prefer_mixin: error
     # prefer_null_aware_method_calls: error
     prefer_null_aware_operators: error
@@ -179,9 +185,11 @@ analyzer:
     # tighten_type_of_initializing_formals: error
     # type_annotate_public_apis: error
     type_init_formals: error
+    type_literal_in_constant_pattern: error
     # unawaited_futures: error
     # unnecessary_await_in_return: error
     unnecessary_brace_in_string_interps: error
+    # unnecessary_breaks: error
     unnecessary_const: error
     unnecessary_constructor_name: error
     # unnecessary_final: error
@@ -194,14 +202,14 @@ analyzer:
     # unnecessary_null_aware_operator_on_extension_on_nullable: error
     # unnecessary_null_checks: error
     unnecessary_null_in_if_null_operators: error
-    # unnecessary_nullable_for_final_variable_declarations: error
+    unnecessary_nullable_for_final_variable_declarations: error
     unnecessary_overrides: error
     # unnecessary_parenthesis: error
     # unnecessary_raw_strings: error
     unnecessary_string_escapes: error
     unnecessary_string_interpolations: error
     unnecessary_this: error
-    # unnecessary_to_list_in_spreads: error
+    unnecessary_to_list_in_spreads: error
     # unreachable_from_main: error
     # use_colored_box: error
     # use_decorated_box: error
@@ -216,18 +224,19 @@ analyzer:
     use_rethrow_when_possible: error
     # use_setters_to_change_properties: error
     # use_string_buffers: error
-    # use_string_in_part_of_directives: error
+    use_string_in_part_of_directives: error
     # use_super_parameters: error
     # use_test_throws_matchers: error
     # use_to_and_as_if_applicable: error
     void_checks: error
     depend_on_referenced_packages: error
     package_names: error
-    # secure_pubspec_urls: error
+    secure_pubspec_urls: error
     # sort_pub_dependencies: error
 
 linter:
   rules:
+
     # Avoid relative imports for files in lib/.
     # - always_use_package_imports
 
@@ -255,6 +264,9 @@ linter:
     # Avoid types as parameter names.
     - avoid_types_as_parameter_names
 
+    # Avoid overriding a final field to return different values if called multiple times.
+    # - avoid_unstable_final_fields
+
     # Avoid using web-only libraries outside Flutter web plugin packages.
     # - avoid_web_libraries_in_flutter
 
@@ -265,14 +277,16 @@ linter:
     # - close_sinks
 
     # Invocation of various collection methods with arguments of unrelated types.
-    # This rule is experimental. Use at your own risk.
-    # - collection_methods_unrelated_type
+    - collection_methods_unrelated_type
 
     # Only reference in scope identifiers in doc comments.
     # - comment_references
 
     # Avoid control flow in finally blocks.
     - control_flow_in_finally
+
+    # Avoid using deprecated elements from within the package in which they are declared.
+    # - deprecated_member_use_from_same_package
 
     # DO reference all public properties in debug methods.
     # - diagnostic_describe_all_properties
@@ -286,15 +300,20 @@ linter:
     # Always override hashCode if overriding ==.
     - hash_and_equals
 
+    # Don’t implicitly reopen classes.
+    # - implicit_reopen
+
+    # Use case expressions that are valid in Dart 3.0.
+    # - invalid_case_patterns
+
     # Conditions should not unconditionally evaluate to true or to false.
-    # This rule is deprecated. Do not use it.
     # - invariant_booleans
 
-    # Invocation of Iterable.contains with references of unrelated types.
-    - iterable_contains_unrelated_type
+    # Invocation of Iterable
+    # - iterable_contains_unrelated_type
 
     # Invocation of remove with references of unrelated types.
-    - list_remove_unrelated_type
+    # - list_remove_unrelated_type
 
     # Boolean expression composed only with literals.
     # - literal_only_boolean_expressions
@@ -308,11 +327,17 @@ linter:
     # Don’t put any logic in createState.
     # - no_logic_in_create_state
 
+    # Don’t assign a variable to itself.
+    # - no_self_assignments
+
+    # Don’t use wildcard parameters or variables.
+    # - no_wildcard_variable_uses
+
     # Prefer relative imports for files in lib/.
     # - prefer_relative_imports
 
     # Don’t use the Null type, unless you are positive that you don’t want void.
-    - prefer_void_to_null
+    # - prefer_void_to_null
 
     # Test type arguments in operator ==(Object other).
     # - test_types_in_equals
@@ -330,7 +355,6 @@ linter:
     # - unsafe_html
 
     # Do not use BuildContexts across async gaps.
-    # This rule is experimental. Use at your own risk.
     # - use_build_context_synchronously
 
     # Use key in widget constructors.
@@ -349,7 +373,7 @@ linter:
     # - always_put_required_named_parameters_first
 
     # Specify @required on named parameters without defaults.
-    - always_require_non_null_named_parameters
+    # - always_require_non_null_named_parameters
 
     # Specify type annotations.
     # - always_specify_types
@@ -357,11 +381,13 @@ linter:
     # Annotate overridden members.
     - annotate_overrides
 
+    # Annotate redeclared members.
+    # - annotate_redeclares
+
     # Avoid annotating with dynamic when not required.
     # - avoid_annotating_with_dynamic
 
     # Avoid using as.
-    # This rule is deprecated. Do not use it.
     # - avoid_as
 
     # Avoid bool literals in conditional expressions.
@@ -467,11 +493,9 @@ linter:
     # - cascade_invocations
 
     # Don’t cast a nullable value to a non nullable type.
-    # This rule is experimental. Use at your own risk.
     # - cast_nullable_to_non_nullable
 
     # Sort combinator names alphabetically.
-    # This rule is experimental. Use at your own risk.
     # - combinators_ordering
 
     # Missing conditional import.
@@ -484,8 +508,7 @@ linter:
     - curly_braces_in_flow_control_structures
 
     # Attach library doc comments to library directives.
-    # This rule is experimental. Use at your own risk.
-    # - dangling_library_doc_comments
+    - dangling_library_doc_comments
 
     # Missing deprecated annotation.
     # - deprecated_consistency
@@ -503,7 +526,6 @@ linter:
     - empty_constructor_bodies
 
     # Do use sound null safety.
-    # This rule is experimental. Use at your own risk.
     # - enable_null_safety
 
     # Put a single newline at end of file.
@@ -522,8 +544,7 @@ linter:
     - implementation_imports
 
     # Explicitly tear-off call methods when using an object as a Function.
-    # This rule is experimental. Use at your own risk.
-    # - implicit_call_tearoffs
+    - implicit_call_tearoffs
 
     # Join return statement with assignment when possible.
     # - join_return_with_assignment
@@ -532,7 +553,6 @@ linter:
     # - leading_newlines_in_multiline_strings
 
     # Attach library annotations to library directives.
-    # This rule is experimental. Use at your own risk.
     # - library_annotations
 
     # Name libraries using lowercase_with_underscores.
@@ -544,14 +564,13 @@ linter:
     # Avoid using private types in public APIs.
     - library_private_types_in_public_api
 
-    # Avoid lines longer than 80 characters.
-    # - lines_longer_than_80_chars
+    # Use matching super parameter names.
+    # - matching_super_parameters
 
     # Missing whitespace between adjacent strings.
     # - missing_whitespace_between_adjacent_strings
 
     # No default cases.
-    # This rule is experimental. Use at your own risk.
     # - no_default_cases
 
     # Avoid leading underscores for library prefixes.
@@ -560,8 +579,8 @@ linter:
     # Avoid leading underscores for local identifiers.
     - no_leading_underscores_for_local_identifiers
 
-    # Avoid calling toString() on runtimeType.
-    # - no_runtimeType_toString
+    # Don’t compare booleans to boolean literals.
+    # - no_literal_bool_comparisons
 
     # Name non-constant identifiers using lowerCamelCase.
     - non_constant_identifier_names
@@ -606,7 +625,6 @@ linter:
     # - prefer_asserts_with_message
 
     # Prefer using a boolean as the assert condition.
-    # This rule is deprecated. Do not use it.
     # - prefer_bool_in_asserts
 
     # Use collection literals when possible.
@@ -637,7 +655,6 @@ linter:
     # - prefer_double_quotes
 
     # Use = to separate a named parameter from its default value.
-    # This rule is deprecated. Do not use it.
     # - prefer_equal_for_default_values
 
     # Use => for short members whose body is a single return statement.
@@ -654,9 +671,6 @@ linter:
 
     # Prefer final for parameter declarations if they are not reassigned.
     # - prefer_final_parameters
-
-    # Prefer ‘for’ elements when building maps from iterables.
-    - prefer_for_elements_to_map_fromIterable
 
     # Use forEach to only apply a function to all the elements.
     # - prefer_foreach
@@ -694,9 +708,6 @@ linter:
     # Prefer is! operator.
     - prefer_is_not_operator
 
-    # Prefer to use whereType on iterable.
-    - prefer_iterable_whereType
-
     # Prefer using mixins.
     # - prefer_mixin
 
@@ -725,7 +736,6 @@ linter:
     - recursive_getters
 
     # Use trailing commas for all function calls and declarations.
-    # This rule is experimental. Use at your own risk.
     # - require_trailing_commas
 
     # SizedBox for whitespace.
@@ -747,7 +757,6 @@ linter:
     # - sort_unnamed_constructors_first
 
     # Place the super call last in a constructor initialization list.
-    # This rule is deprecated. Do not use it.
     # - super_goes_last
 
     # Tighten type of initializing formal.
@@ -759,6 +768,9 @@ linter:
     # Don’t type annotate initializing formals.
     - type_init_formals
 
+    # Don’t use constant patterns with type literals.
+    - type_literal_in_constant_pattern
+
     # Future results in async function bodies must be awaited or marked unawaited using dart:async.
     # - unawaited_futures
 
@@ -767,6 +779,9 @@ linter:
 
     # Avoid using braces in interpolation when not needed.
     - unnecessary_brace_in_string_interps
+
+    # Don’t use explicit breaks when a break is implied.
+    # - unnecessary_breaks
 
     # Avoid const keyword.
     - unnecessary_const
@@ -787,7 +802,6 @@ linter:
     - unnecessary_late
 
     # Avoid library directives unless they have documentation comments or annotations.
-    # This rule is experimental. Use at your own risk.
     # - unnecessary_library_directive
 
     # Unnecessary new keyword.
@@ -800,15 +814,13 @@ linter:
     # - unnecessary_null_aware_operator_on_extension_on_nullable
 
     # Unnecessary null checks.
-    # This rule is experimental. Use at your own risk.
     # - unnecessary_null_checks
 
     # Avoid using null in if null operators.
     - unnecessary_null_in_if_null_operators
 
     # Use a non-nullable type for a final variable initialized with a non-nullable value.
-    # This rule is experimental. Use at your own risk.
-    # - unnecessary_nullable_for_final_variable_declarations
+    - unnecessary_nullable_for_final_variable_declarations
 
     # Don’t override a method to do a super method invocation with the same parameters.
     - unnecessary_overrides
@@ -829,10 +841,9 @@ linter:
     - unnecessary_this
 
     # Unnecessary toList() in spreads.
-    # - unnecessary_to_list_in_spreads
+    - unnecessary_to_list_in_spreads
 
     # Unreachable top-level members in executable libraries.
-    # This rule is experimental. Use at your own risk.
     # - unreachable_from_main
 
     # Use ColoredBox.
@@ -842,7 +853,6 @@ linter:
     # - use_decorated_box
 
     # Use enums rather than classes that behave like enums.
-    # This rule is experimental. Use at your own risk.
     # - use_enums
 
     # Prefer an 8-digit hexadecimal integer(0xFFFFFFFF) to instantiate Color.
@@ -858,7 +868,6 @@ linter:
     # - use_is_even_rather_than_modulo
 
     # Use late for private members with a non-nullable type.
-    # This rule is experimental. Use at your own risk.
     # - use_late_for_private_fields_and_variables
 
     # Use predefined named constants.
@@ -877,11 +886,9 @@ linter:
     # - use_string_buffers
 
     # Use string in part of directives.
-    # This rule is experimental. Use at your own risk.
-    # - use_string_in_part_of_directives
+    - use_string_in_part_of_directives
 
     # Use super-initializer parameters where possible.
-    # This rule is experimental. Use at your own risk.
     # - use_super_parameters
 
     # Use throwsA matcher instead of fail().
@@ -900,7 +907,7 @@ linter:
     - package_names
 
     # Use secure urls in pubspec.yaml.
-    # - secure_pubspec_urls
+    - secure_pubspec_urls
 
     # Sort pub dependencies alphabetically.
     # - sort_pub_dependencies

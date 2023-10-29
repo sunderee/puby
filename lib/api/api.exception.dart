@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:meta/meta.dart';
 
 @immutable
-class ApiException implements Exception {
+final class ApiException implements Exception {
   final HttpClientResponse response;
 
   const ApiException(this.response);
