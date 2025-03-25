@@ -1,0 +1,10 @@
+# IDEs
+.idea
+.vscode
+.cursor
+
+# Miscellaneous
+.DS_Store
+
+# Output
+bin
