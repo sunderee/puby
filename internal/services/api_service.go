@@ -25,6 +25,7 @@ func NewAPIService() *APIService {
 	}
 }
 
+// GetSDKRelease fetches the latest SDK release from the Flutter repository
 func (s *APIService) GetSDKRelease() (*models.SDKReleaseWrapper, error) {
 	request, err := http.NewRequest(HTTP_METHOD, SDK_RELEASE_URL, nil)
 	if err != nil {
@@ -51,6 +52,7 @@ func (s *APIService) GetSDKRelease() (*models.SDKReleaseWrapper, error) {
 	return &sdkRelease, nil
 }
 
+// GetPackage fetches the latest package data from the pub.dev packages repository
 func (s *APIService) GetPackage(packageName string) (*models.PackageWrapper, error) {
 	request, err := http.NewRequest(HTTP_METHOD, fmt.Sprintf(PACKAGE_URL, packageName), nil)
 	if err != nil {
