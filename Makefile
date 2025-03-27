@@ -13,7 +13,7 @@ help: ## Show this help message
 
 test: ## Run tests
 	@echo "Running tests..."
-	@go test -cover -v ./...
+	@go test  -v ./...
 
 clean: ## Clean build artifacts
 	@echo "Cleaning build artifacts..."
