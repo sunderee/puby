@@ -8,3 +8,6 @@
 
 # Output
 bin
+
+# Test coverage
+coverage.out

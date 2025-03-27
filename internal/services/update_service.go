@@ -10,12 +10,12 @@ import (
 )
 
 type UpdateService struct {
-	Config        *config.UpdateServiceConfig
-	PubspecParser *parsers.PubspecParser
-	APIService    *APIService
+	Config        *config.CLIConfig
+	PubspecParser parsers.PubspecParserInterface
+	APIService    APIServiceInterface
 }
 
-func NewUpdateService(pubspecParser *parsers.PubspecParser, apiService *APIService) *UpdateService {
+func NewUpdateService(pubspecParser parsers.PubspecParserInterface, apiService APIServiceInterface) *UpdateService {
 	return &UpdateService{
 		PubspecParser: pubspecParser,
 		APIService:    apiService,
@@ -226,7 +226,47 @@ func (s *UpdateService) produceSliceOfDependenciesToUpdate(pubspec *models.Pubsp
 }
 
 func (s *UpdateService) produceSliceOfDependencyUpdates(dependenciesToUpdate []string, dependencyDataFromAPI []*models.PackageWrapper) []models.DependencyUpdate {
-	return []models.DependencyUpdate{}
+	var dependencyUpdates []models.DependencyUpdate
+
+	// Get the pubspec to extract current versions
+	pubspec, err := s.PubspecParser.Parse()
+	if err != nil {
+		return []models.DependencyUpdate{}
+	}
+
+	// Map package names to their API data for easier lookup
+	packageDataMap := make(map[string]*models.PackageWrapper)
+	for _, packageData := range dependencyDataFromAPI {
+		packageDataMap[packageData.Name] = packageData
+	}
+
+	// Create dependency updates
+	for _, dependencyName := range dependenciesToUpdate {
+		// Get current version from pubspec
+		if currentVersion, ok := pubspec.Dependencies[dependencyName]; ok {
+			// Only handle string versions
+			if currentVersionStr, ok := currentVersion.(string); ok {
+				// Clean up the version string (remove ^, ~, >=, etc.)
+				cleanedCurrentVersion := cleanupVersionString(currentVersionStr)
+
+				// Get the latest version from API data
+				if packageData, exists := packageDataMap[dependencyName]; exists {
+					latestVersion := packageData.LatestVersion.Version
+
+					// Only add to updates if the versions are different
+					if cleanedCurrentVersion != latestVersion {
+						dependencyUpdates = append(dependencyUpdates, models.DependencyUpdate{
+							Name:           dependencyName,
+							CurrentVersion: cleanedCurrentVersion,
+							LatestVersion:  latestVersion,
+						})
+					}
+				}
+			}
+		}
+	}
+
+	return dependencyUpdates
 }
 
 func cleanupVersionString(input string) string {
