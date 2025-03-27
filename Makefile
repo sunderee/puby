@@ -14,6 +14,9 @@ help: ## Show this help message
 test: ## Run tests
 	@echo "Running tests..."
 	@go test  -v ./...
+	@echo "Generating coverage report..."
+	@go test -coverprofile=coverage.out ./...
+	@go tool cover -html=coverage.out -o coverage.html
 
 clean: ## Clean build artifacts
 	@echo "Cleaning build artifacts..."
