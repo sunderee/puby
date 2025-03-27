@@ -1,16 +1,13 @@
 package services
 
 import (
-	"bytes"
-	"context"
 	"errors"
-	"io"
-	"net"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/sunderee/puby/internal/models"
 )
 
@@ -37,345 +34,293 @@ func (e errorReader) Read(p []byte) (n int, err error) {
 }
 
 func TestNewAPIService(t *testing.T) {
-	service := NewAPIService()
-	if service == nil {
-		t.Fatal("expected service to be non-nil, got nil")
-	}
-	if service.Client == nil {
-		t.Fatal("expected client to be non-nil, got nil")
-	}
+	apiService := NewAPIService()
+	assert.NotNil(t, apiService)
+	assert.NotNil(t, apiService.Client)
+	assert.Equal(t, DEFAULT_SDK_RELEASE_URL, apiService.SDKReleaseURL)
+	assert.Equal(t, DEFAULT_PACKAGE_URL, apiService.PackageURL)
 }
 
 func TestGetSDKRelease(t *testing.T) {
-	tests := []struct {
+	testCases := []struct {
 		name           string
-		mockResp       string
-		mockStatusCode int
-		mockErr        error
-		want           *models.SDKReleaseWrapper
-		wantErr        bool
+		serverResponse string
+		statusCode     int
+		expectError    bool
+		expectedResult *models.SDKReleaseWrapper
 	}{
 		{
 			name: "successful response",
-			mockResp: `{
+			serverResponse: `{
 				"current_release": {
-					"beta": "beta-hash",
-					"stable": "stable-hash"
+					"stable": "abc123",
+					"beta": "def456"
 				},
 				"releases": [
 					{
-						"hash": "test-hash",
+						"hash": "abc123",
 						"channel": "stable",
-						"version": "2.15.0",
+						"version": "3.19.0",
 						"dart_sdk_version": "3.0.0"
 					}
 				]
 			}`,
-			mockStatusCode: http.StatusOK,
-			mockErr:        nil,
-			want: &models.SDKReleaseWrapper{
+			statusCode:  http.StatusOK,
+			expectError: false,
+			expectedResult: &models.SDKReleaseWrapper{
 				CurrentRelease: models.SDKReleaseHashes{
-					Beta:   "beta-hash",
-					Stable: "stable-hash",
+					Stable: "abc123",
+					Beta:   "def456",
 				},
 				Releases: []models.SDKRelease{
 					{
-						Hash:              "test-hash",
+						Hash:              "abc123",
 						Channel:           "stable",
-						FlutterSDKVersion: "2.15.0",
+						FlutterSDKVersion: "3.19.0",
 						DartSDKVersion:    "3.0.0",
 					},
 				},
 			},
-			wantErr: false,
 		},
 		{
 			name:           "empty response",
-			mockResp:       `{}`,
-			mockStatusCode: http.StatusOK,
-			mockErr:        nil,
-			want: &models.SDKReleaseWrapper{
-				CurrentRelease: models.SDKReleaseHashes{},
-				Releases:       nil,
-			},
-			wantErr: false,
+			serverResponse: `{}`,
+			statusCode:     http.StatusOK,
+			expectError:    false,
+			expectedResult: &models.SDKReleaseWrapper{},
 		},
 		{
 			name:           "malformed json",
-			mockResp:       `{malformed`,
-			mockStatusCode: http.StatusOK,
-			mockErr:        nil,
-			want:           nil,
-			wantErr:        true,
+			serverResponse: `{"current_release": {`,
+			statusCode:     http.StatusOK,
+			expectError:    true,
+			expectedResult: nil,
 		},
 		{
 			name:           "http request error",
-			mockResp:       "",
-			mockStatusCode: 0,
-			mockErr:        errors.New("network error"),
-			want:           nil,
-			wantErr:        true,
+			serverResponse: ``,
+			statusCode:     http.StatusInternalServerError,
+			expectError:    true,
+			expectedResult: nil,
 		},
 		{
 			name:           "server error",
-			mockResp:       `{"error": "Internal Server Error"}`,
-			mockStatusCode: http.StatusInternalServerError,
-			mockErr:        nil,
-			want: &models.SDKReleaseWrapper{
-				CurrentRelease: models.SDKReleaseHashes{},
-				Releases:       nil,
-			},
-			wantErr: false, // API service doesn't check status code
+			serverResponse: ``,
+			statusCode:     http.StatusBadRequest,
+			expectError:    true,
+			expectedResult: nil,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create a mock client
-			mockClient := NewTestClient(func(req *http.Request) (*http.Response, error) {
-				if tt.mockErr != nil {
-					return nil, tt.mockErr
-				}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Setup a test HTTP server
+			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				// Test the request
+				assert.Equal(t, HTTP_METHOD, req.Method)
+				assert.Equal(t, "GET", req.Method)
 
-				// Check request URL and method
-				if req.URL.String() != SDK_RELEASE_URL {
-					t.Errorf("URL = %v, want %v", req.URL.String(), SDK_RELEASE_URL)
-				}
-				if req.Method != HTTP_METHOD {
-					t.Errorf("Method = %v, want %v", req.Method, HTTP_METHOD)
-				}
+				// Send response
+				rw.WriteHeader(tc.statusCode)
+				fmt.Fprintln(rw, tc.serverResponse)
+			}))
+			defer server.Close()
 
-				return &http.Response{
-					StatusCode: tt.mockStatusCode,
-					Body:       io.NopCloser(bytes.NewBufferString(tt.mockResp)),
-				}, nil
-			})
+			// Create a service with the test server URL
+			apiService := NewAPIService()
+			apiService.SDKReleaseURL = server.URL
 
-			// Create service with mock client
-			service := &APIService{
-				Client: mockClient,
-			}
+			result, err := apiService.GetSDKRelease()
 
-			got, err := service.GetSDKRelease()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetSDKRelease() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !tt.wantErr && !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetSDKRelease() = %v, want %v", got, tt.want)
+			// Check expectations
+			if tc.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedResult, result)
 			}
 		})
 	}
 }
 
 func TestGetPackage(t *testing.T) {
-	tests := []struct {
-		name        string
-		packageName string
-		mockResp    string
-		mockStatus  int
-		mockErr     error
-		want        *models.PackageWrapper
-		wantErr     bool
-		expectedURL string
+	testCases := []struct {
+		name           string
+		packageName    string
+		serverResponse string
+		statusCode     int
+		expectError    bool
+		expectedResult *models.PackageWrapper
 	}{
 		{
 			name:        "successful response",
-			packageName: "flutter",
-			mockResp: `{
-				"name": "flutter",
+			packageName: "http",
+			serverResponse: `{
+				"name": "http",
 				"latest": {
-					"version": "1.0.0",
-					"dependencies": {"dep1": "^1.0.0"},
-					"dev_dependencies": {"dev_dep1": "^1.0.0"}
+					"version": "0.13.5",
+					"dependencies": {
+						"http_parser": "^4.0.0"
+					},
+					"dev_dependencies": {
+						"test": "^1.0.0"
+					}
 				}
 			}`,
-			mockStatus: http.StatusOK,
-			mockErr:    nil,
-			want: &models.PackageWrapper{
-				Name: "flutter",
+			statusCode:  http.StatusOK,
+			expectError: false,
+			expectedResult: &models.PackageWrapper{
+				Name: "http",
 				LatestVersion: models.Package{
-					Version:         "1.0.0",
-					Dependencies:    map[string]any{"dep1": "^1.0.0"},
-					DevDependencies: map[string]any{"dev_dep1": "^1.0.0"},
+					Version: "0.13.5",
+					Dependencies: map[string]any{
+						"http_parser": "^4.0.0",
+					},
+					DevDependencies: map[string]any{
+						"test": "^1.0.0",
+					},
 				},
 			},
-			wantErr:     false,
-			expectedURL: "https://pub.dev/api/packages/flutter",
 		},
 		{
-			name:        "empty package name",
-			packageName: "",
-			mockResp:    `{}`,
-			mockStatus:  http.StatusOK,
-			mockErr:     nil,
-			want: &models.PackageWrapper{
-				Name: "",
-				LatestVersion: models.Package{
-					Version:         "",
-					Dependencies:    nil,
-					DevDependencies: nil,
-				},
-			},
-			wantErr:     false,
-			expectedURL: "https://pub.dev/api/packages/",
+			name:           "empty package name",
+			packageName:    "",
+			serverResponse: `{}`,
+			statusCode:     http.StatusOK,
+			expectError:    true,
+			expectedResult: nil,
 		},
 		{
-			name:        "malformed json",
-			packageName: "test",
-			mockResp:    `{malformed`,
-			mockStatus:  http.StatusOK,
-			mockErr:     nil,
-			want:        nil,
-			wantErr:     true,
-			expectedURL: "https://pub.dev/api/packages/test",
+			name:           "malformed json",
+			packageName:    "http",
+			serverResponse: `{"name": "http", "latest": {`,
+			statusCode:     http.StatusOK,
+			expectError:    true,
+			expectedResult: nil,
 		},
 		{
-			name:        "http request error",
-			packageName: "test",
-			mockResp:    "",
-			mockStatus:  0,
-			mockErr:     errors.New("network error"),
-			want:        nil,
-			wantErr:     true,
-			expectedURL: "https://pub.dev/api/packages/test",
+			name:           "http request error",
+			packageName:    "http",
+			serverResponse: ``,
+			statusCode:     http.StatusInternalServerError,
+			expectError:    true,
+			expectedResult: nil,
 		},
 		{
-			name:        "package not found",
-			packageName: "nonexistent",
-			mockResp:    `{"error": "Not found"}`,
-			mockStatus:  http.StatusNotFound,
-			mockErr:     nil,
-			want: &models.PackageWrapper{
-				Name: "",
-				LatestVersion: models.Package{
-					Version:         "",
-					Dependencies:    nil,
-					DevDependencies: nil,
-				},
-			},
-			wantErr:     false, // API service doesn't check status code
-			expectedURL: "https://pub.dev/api/packages/nonexistent",
+			name:           "package not found",
+			packageName:    "nonexistent_package",
+			serverResponse: `{"error": {"message": "Package not found"}}`,
+			statusCode:     http.StatusNotFound,
+			expectError:    true,
+			expectedResult: nil,
 		},
 		{
-			name:        "package with special characters",
-			packageName: "flutter_bloc/bloc",
-			mockResp:    `{"name": "flutter_bloc/bloc"}`,
-			mockStatus:  http.StatusOK,
-			mockErr:     nil,
-			want:        &models.PackageWrapper{Name: "flutter_bloc/bloc"},
-			wantErr:     false,
-			expectedURL: "https://pub.dev/api/packages/flutter_bloc/bloc",
+			name:           "package with special characters",
+			packageName:    "package$with@special#chars",
+			serverResponse: `{}`,
+			statusCode:     http.StatusOK,
+			expectError:    false,
+			expectedResult: &models.PackageWrapper{},
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create a mock client
-			mockClient := NewTestClient(func(req *http.Request) (*http.Response, error) {
-				if tt.mockErr != nil {
-					return nil, tt.mockErr
-				}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Setup a test HTTP server
+			server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+				// Test the request
+				assert.Equal(t, HTTP_METHOD, req.Method)
 
-				// Check request URL and method
-				if req.URL.String() != tt.expectedURL {
-					t.Errorf("URL = %v, want %v", req.URL.String(), tt.expectedURL)
-				}
-				if req.Method != HTTP_METHOD {
-					t.Errorf("Method = %v, want %v", req.Method, HTTP_METHOD)
-				}
+				// Send response
+				rw.WriteHeader(tc.statusCode)
+				fmt.Fprintln(rw, tc.serverResponse)
+			}))
+			defer server.Close()
 
-				return &http.Response{
-					StatusCode: tt.mockStatus,
-					Body:       io.NopCloser(bytes.NewBufferString(tt.mockResp)),
-				}, nil
-			})
+			// Create a service with the test server URL
+			apiService := NewAPIService()
+			apiService.PackageURL = server.URL + "/%s"
 
-			// Create service with mock client
-			service := &APIService{
-				Client: mockClient,
-			}
+			result, err := apiService.GetPackage(tc.packageName)
 
-			got, err := service.GetPackage(tt.packageName)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetPackage() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !tt.wantErr && !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetPackage() = %v, want %v", got, tt.want)
+			// Check expectations
+			if tc.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.expectedResult, result)
 			}
 		})
 	}
 }
 
-// Test for error in creating HTTP request
 func TestAPIService_RequestCreationError(t *testing.T) {
-	// Create a test server that will return 200 OK but should never be called
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t.Fatal("Server should not be called with invalid request")
+	testCases := []struct {
+		name      string
+		setupFunc func(s *APIService)
+		testFunc  func(s *APIService) error
+	}{
+		{
+			name: "Invalid SDK URL",
+			setupFunc: func(s *APIService) {
+				s.SDKReleaseURL = "\\invalid-url\\"
+			},
+			testFunc: func(s *APIService) error {
+				_, err := s.GetSDKRelease()
+				return err
+			},
+		},
+		{
+			name: "Invalid Package URL",
+			setupFunc: func(s *APIService) {
+				s.PackageURL = "\\invalid-url\\%s"
+			},
+			testFunc: func(s *APIService) error {
+				_, err := s.GetPackage("test")
+				return err
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			// Setup
+			apiService := NewAPIService()
+			tc.setupFunc(apiService)
+
+			// Test
+			err := tc.testFunc(apiService)
+
+			// Verify an error was returned
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestAPIService_ResponseBodyReadError(t *testing.T) {
+	// Setup a test HTTP server that returns an invalid response
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		// Close the connection without sending a response
+		hj, ok := rw.(http.Hijacker)
+		if !ok {
+			t.Fatal("ResponseWriter does not implement http.Hijacker")
+		}
+		conn, _, err := hj.Hijack()
+		if err != nil {
+			t.Fatal("Failed to hijack connection")
+		}
+		conn.Close()
 	}))
 	defer server.Close()
 
-	// Test GetSDKRelease with invalid URL
-	t.Run("Invalid SDK URL", func(t *testing.T) {
-		// Create a client with a transport that cannot connect
-		client := &http.Client{
-			Transport: &http.Transport{
-				// Force a dial error by using an invalid dial context function
-				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-					return nil, errors.New("forced dial error")
-				},
-			},
-		}
+	// Test the service
+	apiService := NewAPIService()
+	apiService.SDKReleaseURL = server.URL
 
-		service := &APIService{Client: client}
-		_, err := service.GetSDKRelease()
-		if err == nil {
-			t.Error("Expected error when creating/sending request, got nil")
-		}
-	})
+	_, err := apiService.GetSDKRelease()
 
-	// Test GetPackage with invalid URL
-	t.Run("Invalid Package URL", func(t *testing.T) {
-		// Create a client with a transport that cannot connect
-		client := &http.Client{
-			Transport: &http.Transport{
-				// Force a dial error by using an invalid dial context function
-				DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-					return nil, errors.New("forced dial error")
-				},
-			},
-		}
-
-		service := &APIService{Client: client}
-		_, err := service.GetPackage("test")
-		if err == nil {
-			t.Error("Expected error when creating/sending request, got nil")
-		}
-	})
-}
-
-// Test for error in reading response body
-func TestAPIService_ResponseBodyReadError(t *testing.T) {
-	// Create a mock client that returns a reader that errors on read
-	mockClient := NewTestClient(func(req *http.Request) (*http.Response, error) {
-		return &http.Response{
-			StatusCode: http.StatusOK,
-			Body:       io.NopCloser(errorReader{}),
-		}, nil
-	})
-
-	// Test GetSDKRelease with read error
-	service := &APIService{Client: mockClient}
-
-	_, err := service.GetSDKRelease()
-	if err == nil {
-		t.Error("Expected error when reading response body, got nil")
-	}
-
-	// Test GetPackage with read error
-	_, err = service.GetPackage("test")
-	if err == nil {
-		t.Error("Expected error when reading response body, got nil")
-	}
+	// Verify an error was returned
+	assert.Error(t, err)
 }

@@ -17,6 +17,7 @@ func NewPubspecParser(pubspecFilePath string) *PubspecParser {
 	}
 }
 
+// Open the pubspec.yaml file and parse it into a Pubspec struct
 func (p *PubspecParser) Parse() (*models.Pubspec, error) {
 	yamlFile, err := os.ReadFile(p.PubspecFilePath)
 	if err != nil {
