@@ -196,28 +196,51 @@ func (s *UpdateService) isThereAConflictBetweenIncludedAndExcludedPackages(pubsp
 
 func (s *UpdateService) produceSliceOfDependenciesToUpdate(pubspec *models.Pubspec) []string {
 	var dependenciesToUpdate []string
+	var includedPackages, excludedPackages []string
 
+	// Get include and exclude packages if they exist
+	if s.Config.IncludePackages != nil {
+		includedPackages = *s.Config.IncludePackages
+	}
+	if s.Config.ExcludePackages != nil {
+		excludedPackages = *s.Config.ExcludePackages
+	}
+
+	// Process all dependencies
 	for dependencyName, dependencyVersion := range pubspec.Dependencies {
-		// Is version of a type string?
+		// Skip non-string versions (like SDK references)
 		if _, ok := dependencyVersion.(string); !ok {
 			continue
 		}
 
-		// If includes array exists, check if it's inside of it
-		if s.Config.IncludePackages != nil {
-			for _, includedPackage := range *s.Config.IncludePackages {
-				if strings.Contains(includedPackage, dependencyName) {
-					dependenciesToUpdate = append(dependenciesToUpdate, dependencyName)
-				}
-			}
+		// If no includes or excludes are specified, add all dependencies
+		if len(includedPackages) == 0 && len(excludedPackages) == 0 {
+			dependenciesToUpdate = append(dependenciesToUpdate, dependencyName)
+			continue
 		}
 
-		// If excludes array exists, check if it's not inside of it
-		if s.Config.ExcludePackages != nil {
-			for _, excludedPackage := range *s.Config.ExcludePackages {
-				if !strings.Contains(excludedPackage, dependencyName) {
+		// If includes are specified, only add if in the includes list
+		if len(includedPackages) > 0 {
+			for _, includedPackage := range includedPackages {
+				if strings.Contains(dependencyName, includedPackage) {
 					dependenciesToUpdate = append(dependenciesToUpdate, dependencyName)
+					break
 				}
+			}
+			continue
+		}
+
+		// If excludes are specified, add unless in the excludes list
+		if len(excludedPackages) > 0 {
+			isExcluded := false
+			for _, excludedPackage := range excludedPackages {
+				if strings.Contains(dependencyName, excludedPackage) {
+					isExcluded = true
+					break
+				}
+			}
+			if !isExcluded {
+				dependenciesToUpdate = append(dependenciesToUpdate, dependencyName)
 			}
 		}
 	}

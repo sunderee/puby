@@ -21,7 +21,7 @@ const (
 func main() {
 	// Define command-line flags
 	useBetaSDKs := flag.Bool("beta", false, "Use beta versions for SDK updates")
-	checkFlutterSDK := flag.Bool("flutter", true, "Check Flutter SDK version")
+	checkFlutterSDK := flag.Bool("flutter", false, "Check Flutter SDK version")
 	writeChanges := flag.Bool("write", false, "Write changes to pubspec.yaml (otherwise run in dry-run mode)")
 	pubspecPath := flag.String("path", "pubspec.yaml", "Path to the pubspec.yaml file")
 	showHelp := flag.Bool("help", false, "Show help message")

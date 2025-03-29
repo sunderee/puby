@@ -13,6 +13,7 @@ help: ## Show this help message
 
 build: ## Build the project
 	@echo "Building the project..."
+	@rm -rf bin
 	@go build -o bin/puby cmd/puby/main.go
 
 test: ## Run tests

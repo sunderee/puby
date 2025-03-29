@@ -29,7 +29,7 @@ mv puby /usr/local/bin/  # Linux/macOS
 ## Usage
 
 ```bash
-# Check for updates in the current directory
+# Check for updates in the current directory (checks all dependencies)
 puby
 
 # Check for updates in a specific directory
@@ -44,7 +44,7 @@ puby --include=http,path,provider
 # Check all packages except specific ones
 puby --exclude=flutter_svg
 
-# Check for Flutter SDK updates too
+# Enable Flutter SDK update check
 puby --flutter
 
 # Consider beta SDK versions
@@ -63,9 +63,9 @@ puby --version
 |--------|---------|-------------|
 | `--path` | `pubspec.yaml` | Path to the pubspec.yaml file |
 | `--write` | `false` | Write changes to pubspec.yaml (otherwise run in dry-run mode) |
-| `--include` | | Comma-separated list of packages to include in update check |
+| `--include` | | Comma-separated list of packages to include in update check (if not specified, all packages are checked) |
 | `--exclude` | | Comma-separated list of packages to exclude from update check |
-| `--flutter` | `true` | Check Flutter SDK version |
+| `--flutter` | `false` | Check Flutter SDK version |
 | `--beta` | `false` | Use beta versions for SDK updates |
 | `--help` | `false` | Show help message |
 | `--version` | `false` | Show version information |
@@ -76,6 +76,26 @@ puby --version
 
 ```bash
 puby
+```
+
+Output:
+```
+Checking for updates in /path/to/pubspec.yaml...
+=== SDK Updates ===
+Dart SDK: 3.7.2
+
+=== Dependency Updates ===
+http    : 0.13.3 → 1.3.0
+path    : 1.8.0 → 1.9.1
+provider: 6.0.0 → 6.1.4
+
+Running in dry-run mode. Use --write flag to apply changes.
+```
+
+### Enabling Flutter SDK check
+
+```bash
+puby --flutter
 ```
 
 Output:
@@ -104,7 +124,6 @@ Output:
 Checking for updates in /path/to/pubspec.yaml...
 === SDK Updates ===
 Dart SDK: 3.7.2
-Flutter SDK: 3.29.2
 
 === Dependency Updates ===
 http    : 0.13.3 → 1.3.0

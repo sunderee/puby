@@ -502,7 +502,22 @@ func TestUpdateService_ProduceSliceOfDependenciesToUpdate(t *testing.T) {
 					},
 				},
 			},
-			expectedDependencies: []string{},
+			expectedDependencies: []string{"http"},
+		},
+		{
+			name:   "default case - no include or exclude filters",
+			config: &config.CLIConfig{},
+			pubspec: &models.Pubspec{
+				Dependencies: map[string]any{
+					"http":        "^0.13.3",
+					"path":        "^1.8.0",
+					"flutter_svg": "^1.0.0",
+					"flutter": map[string]string{
+						"sdk": "flutter",
+					},
+				},
+			},
+			expectedDependencies: []string{"http", "path", "flutter_svg"},
 		},
 	}
 
