@@ -11,6 +11,10 @@ help: ## Show this help message
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(BLUE)%-20s$(RESET) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+build: ## Build the project
+	@echo "Building the project..."
+	@go build -o bin/puby cmd/puby/main.go
+
 test: ## Run tests
 	@echo "Running tests..."
 	@go test  -v ./...
